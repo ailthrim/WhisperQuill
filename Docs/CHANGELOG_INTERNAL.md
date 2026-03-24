@@ -12,6 +12,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-03-24] - README.md
+
+### Added
+- `README.md` at repo root — project overview, features, requirements, setup guide, architecture summary, project structure, and roadmap for GitHub
+
+---
+
 ## [2026-03-11] - Housekeeping: Commit, Push, Branch Cleanup
 
 ### Changed
