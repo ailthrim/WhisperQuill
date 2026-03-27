@@ -50,35 +50,6 @@ This is a **solo hobby project** — primarily a playground for learning agentic
 
 ---
 
-## Getting Started
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/joshellis625/JChat.git
-cd JChat
-```
-
-### 2. Open in Xcode
-
-```bash
-open WhisperQuill.xcodeproj
-```
-
-### 3. Set your signing team
-
-In Xcode, select the **WhisperQuill** target → **Signing & Capabilities** → set your Apple Developer team for automatic signing.
-
-### 4. Build & run
-
-Select **My Mac** as the destination and press **⌘R**.
-
-### 5. Add your OpenRouter API key
-
-On first launch, WhisperQuill will prompt you to open Settings and enter your [OpenRouter API key](https://openrouter.ai/keys). The key is stored securely in the macOS Keychain.
-
----
-
 ## Architecture
 
 WhisperQuill follows a clean separation of concerns with protocol-backed layers:
