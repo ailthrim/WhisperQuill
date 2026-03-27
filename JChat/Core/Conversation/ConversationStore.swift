@@ -3,8 +3,11 @@
 //  JChat
 //
 
+import os
 import SwiftData
 import SwiftUI
+
+private let logger = Logger(subsystem: "com.josh.jchat", category: "ConversationStore")
 
 /// Primary state store for the V2 chat surface.
 @MainActor
@@ -402,7 +405,7 @@ final class ConversationStore {
                 do {
                     try repository.save(context: context)
                 } catch {
-                    print("[ConversationStore] Save after cancellation failed: \(error)")
+                    logger.error("Save after cancellation failed: \(error)")
                 }
             } catch {
                 applyFlushed(accumulator.flush())
@@ -415,7 +418,7 @@ final class ConversationStore {
                 do {
                     try context.save()
                 } catch {
-                    print("[ConversationStore] Save after stream error failed: \(error)")
+                    logger.error("Save after stream error failed: \(error)")
                 }
             }
 
@@ -462,12 +465,12 @@ final class ConversationStore {
             do {
                 try repository.save(context: context)
             } catch {
-                print("[ConversationStore] Save after generation settle failed: \(error)")
+                logger.error("Save after generation settle failed: \(error)")
             }
-            print("[ConversationStore] Cost settled: \(generationID) — $\(settledCost) (was $\(estimatedCost))")
+            logger.info("Cost settled: \(generationID) — $\(settledCost) (was $\(estimatedCost))")
         } catch {
             // Non-fatal: streaming cost estimate remains. Token counts are unaffected.
-            print("[ConversationStore] /generation fetch failed for \(generationID): \(error)")
+            logger.warning("/generation fetch failed for \(generationID): \(error)")
         }
     }
 
@@ -483,14 +486,14 @@ final class ConversationStore {
             if let normalizedTitle = normalizedAutoTitle(title), !normalizedTitle.isEmpty {
                 chat.title = normalizedTitle
                 try repository.save(context: context)
-                print("[AutoTitle] Success for chat \(chat.id) with model \(autoTitleModelID(for: chat))")
+                logger.info("Auto-title success for chat \(chat.id) with model \(self.autoTitleModelID(for: chat))")
             } else {
                 titleGenerationFailedChatIDs.insert(chat.id)
-                print("[AutoTitle] Empty/invalid title for chat \(chat.id) with model \(autoTitleModelID(for: chat))")
+                logger.warning("Auto-title empty/invalid for chat \(chat.id) with model \(self.autoTitleModelID(for: chat))")
             }
         } catch {
             titleGenerationFailedChatIDs.insert(chat.id)
-            print("[AutoTitle] Failed for chat \(chat.id) with model \(autoTitleModelID(for: chat)): \(error)")
+            logger.error("Auto-title failed for chat \(chat.id) with model \(self.autoTitleModelID(for: chat)): \(error)")
         }
     }
 

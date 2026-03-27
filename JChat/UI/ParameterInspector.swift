@@ -36,7 +36,6 @@ private struct NumberField<T: Numeric & Comparable>: View {
     let format: (T) -> String
     let parse: (String) -> T?
 
-    @Environment(\.textBaseSize) private var textBaseSize
     @State private var draft: String = ""
     @FocusState private var focused: Bool
 
@@ -45,7 +44,7 @@ private struct NumberField<T: Numeric & Comparable>: View {
             .focused($focused)
             .multilineTextAlignment(.trailing)
             .frame(width: 62)
-            .font(.system(size: TextSizeConfig.scaled(13, base: textBaseSize), weight: .regular, design: .monospaced))
+            .appFont(.subheadline, design: .monospaced)
             .foregroundStyle(.primary)
             .onAppear { draft = format(value) }
             .onChange(of: value) { _, newVal in

@@ -13,13 +13,19 @@ final class AppSettings {
     var defaultModelID: String?
     var modelCacheMaxAge: TimeInterval
     var lastModelFetchDate: Date?
+
+    // Stores the user's Cmd+/- text size override as a DynamicTypeSize key.
+    // nil = follow the system preference (Settings > Accessibility > Display > Text Size).
+    var dynamicTypeSizeOverride: String?
+
+    // Legacy fields kept for SwiftData schema compatibility — no longer read or written.
     var textPointSize: Double = 15.0
-    // Retained for schema stability after the one-time migration experiment.
     var didApplyTextSizeDefaultMigration: Bool = false
 
     init() {
         id = UUID()
         modelCacheMaxAge = 86400 // 24 hours
+        dynamicTypeSizeOverride = nil
         textPointSize = 15.0
         didApplyTextSizeDefaultMigration = false
     }

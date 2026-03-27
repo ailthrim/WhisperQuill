@@ -25,10 +25,10 @@ struct SidebarView: View {
             // Header
             HStack(alignment: .center, spacing: 6) {
                 Text("Chats")
-                    .appFont(size: 24, weight: .bold, design: .rounded)
+                    .appFont(.title2, design: .rounded, weight: .bold)
                     .foregroundStyle(.primary)
                 Text("\(chats.count)")
-                    .appFont(size: 12, weight: .semibold, design: .rounded)
+                    .appFont(.caption, design: .rounded, weight: .semibold)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
@@ -88,10 +88,10 @@ struct SidebarView: View {
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "server.rack")
-                        .appFont(size: 13, weight: .medium)
+                        .appFont(.subheadline, weight: .medium)
                         .frame(width: 18)
                     Text("Model Manager")
-                        .appFont(size: 13, weight: .medium, design: .rounded)
+                        .appFont(.subheadline, design: .rounded, weight: .medium)
                     Spacer()
                 }
                 .foregroundStyle(.secondary)
@@ -106,10 +106,10 @@ struct SidebarView: View {
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "gear")
-                        .appFont(size: 13, weight: .medium)
+                        .appFont(.subheadline, weight: .medium)
                         .frame(width: 18)
                     Text("Settings")
-                        .appFont(size: 13, weight: .medium, design: .rounded)
+                        .appFont(.subheadline, design: .rounded, weight: .medium)
                     Spacer()
                 }
                 .foregroundStyle(.secondary)
@@ -185,24 +185,24 @@ private struct SidebarRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if isGeneratingTitle {
-                AutoTitleLoadingTitleView(fontSize: 15, width: 170)
+                AutoTitleLoadingTitleView(textStyle: .body, width: 170)
             } else {
                 HStack(spacing: 6) {
                     Text(chat.displayTitle)
-                        .appFont(size: 15, weight: .semibold, design: .rounded)
+                        .appFont(.body, design: .rounded, weight: .semibold)
                         .foregroundStyle(.primary)
                         .lineLimit(1)
 
                     if didFailGeneratingTitle && chat.title == "New Chat" {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .appFont(size: 10, weight: .semibold)
+                            .appFont(.caption2, weight: .semibold)
                             .foregroundStyle(.orange)
                     }
                 }
             }
 
             Text(previewText)
-                .appFont(size: 12, weight: .medium, design: .rounded)
+                .appFont(.caption, design: .rounded, weight: .medium)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
 
@@ -217,7 +217,7 @@ private struct SidebarRow: View {
                 Text("•")
                 Text(chatTimestampText)
             }
-            .appFont(size: 11, weight: .semibold, design: .rounded)
+            .appFont(.caption, design: .rounded, weight: .semibold)
             .foregroundStyle(.secondary)
         }
         .padding(.horizontal, 12)
@@ -266,7 +266,6 @@ struct ConversationPane: View {
 
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \CachedModel.name) private var cachedModels: [CachedModel]
-    @Environment(\.textBaseSize) private var textBaseSize
     @State private var rows: [MessageRowViewData] = []
     @State private var totalMessageCount = 0
     @State private var lastStreamAutoScrollAt = ContinuousClock.now
@@ -288,7 +287,7 @@ struct ConversationPane: View {
                 List {
                     if totalMessageCount > rows.count {
                         Text("Showing most recent \(rows.count) messages for stability")
-                            .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .semibold, design: .rounded))
+                            .appFont(.caption, design: .rounded, weight: .semibold)
                             .foregroundStyle(.secondary)
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 4, trailing: 12))
@@ -355,11 +354,11 @@ struct ConversationPane: View {
                         .foregroundStyle(.yellow)
                     VStack(alignment: .leading, spacing: 3) {
                         Text(error)
-                            .font(.system(size: TextSizeConfig.scaled(13, base: textBaseSize), weight: .semibold, design: .rounded))
+                            .appFont(.subheadline, design: .rounded, weight: .semibold)
                             .foregroundStyle(.primary)
                         if let suggestion = store.errorSuggestion {
                             Text(suggestion)
-                                .font(.system(size: TextSizeConfig.scaled(12, base: textBaseSize), weight: .medium, design: .rounded))
+                                .appFont(.caption, design: .rounded, weight: .medium)
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -368,7 +367,7 @@ struct ConversationPane: View {
                         dismissErrorBanner()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .appFont(size: 16, weight: .semibold)
+                            .appFont(.body, weight: .semibold)
                             .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
@@ -423,24 +422,24 @@ struct ConversationPane: View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 if store.isGeneratingTitle(for: chat.id) {
-                    AutoTitleLoadingTitleView(fontSize: TextSizeConfig.scaled(17, base: textBaseSize), width: 220)
+                    AutoTitleLoadingTitleView(textStyle: .headline, width: 220)
                 } else {
                     HStack(spacing: 8) {
                         Text(chat.displayTitle)
-                            .font(.system(size: TextSizeConfig.scaled(17, base: textBaseSize), weight: .semibold, design: .rounded))
+                            .appFont(.headline, design: .rounded)
                             .foregroundStyle(.primary)
                             .lineLimit(1)
 
                         if store.didFailGeneratingTitle(for: chat.id) && chat.title == "New Chat" {
                             Text("Title generation failed")
-                                .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .medium, design: .rounded))
+                                .appFont(.caption, design: .rounded, weight: .medium)
                                 .foregroundStyle(.orange)
                         }
                     }
                 }
 
                 Text("\(chat.totalTokens) tokens • \(chat.totalCost, format: .currency(code: "USD"))")
-                    .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .medium, design: .rounded))
+                    .appFont(.caption, design: .rounded, weight: .medium)
                     .foregroundStyle(.secondary)
             }
 
@@ -469,19 +468,19 @@ struct ConversationPane: View {
             )
             .layoutPriority(2)
 
-            // Parameter inspector toggle — Liquid Glass circle, moves left with content as inspector opens
+            // Parameter inspector toggle
             Button {
                 showParameterInspector.toggle()
             } label: {
                 Image(systemName: "slider.horizontal.3")
-                    .appFont(size: 13, weight: .medium)
+                    .appFont(.subheadline, weight: .medium)
                     .foregroundStyle(showParameterInspector ? Color.accentColor : .secondary)
                     .frame(width: 28, height: 28)
                     .overlay(alignment: .topTrailing) {
                         let count = chat.activeOverrideCount
                         if count > 0 {
                             Text("\(count)")
-                                .appFont(size: 9, weight: .bold, design: .rounded)
+                                .appFont(.caption2, design: .rounded, weight: .bold)
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 3.5)
                                 .padding(.vertical, 1)
@@ -601,18 +600,20 @@ struct ConversationPane: View {
     }
 }
 
+// MARK: - Auto-title loading placeholder
+
 private struct AutoTitleLoadingTitleView: View {
-    let fontSize: CGFloat
+    let textStyle: AppTextStyle
     let width: CGFloat
     @State private var pulse = false
 
     var body: some View {
         RoundedRectangle(cornerRadius: 6, style: .continuous)
             .fill(Color.primary.opacity(0.14))
-            .frame(width: width, height: max(16, fontSize + 2))
+            .frame(width: width, height: 20)
             .overlay(alignment: .leading) {
                 Text("Generating title...")
-                    .font(.system(size: fontSize, weight: .semibold, design: .rounded))
+                    .appFont(textStyle, design: .rounded, weight: .semibold)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 8)
             }
@@ -624,6 +625,8 @@ private struct AutoTitleLoadingTitleView: View {
             }
     }
 }
+
+// MARK: - Message action buttons
 
 private struct MessageActionButtonStyle: ButtonStyle {
     var isHovered: Bool
@@ -648,7 +651,7 @@ private struct MessageActionButton: View {
         Button(action: action) {
             Image(systemName: systemImage)
                 .contentTransition(.symbolEffect(.replace))
-                .font(.system(size: 15, weight: .bold))
+                .appFont(.body, weight: .bold)
                 .foregroundStyle(isActive ? .white : tint)
                 .frame(width: 30, height: 30)
                 .background {
@@ -665,6 +668,8 @@ private struct MessageActionButton: View {
     }
 }
 
+// MARK: - Message inspector sheet
+
 private struct MessageInspectorSheet: View {
     let title: String
     let json: String
@@ -676,7 +681,7 @@ private struct MessageInspectorSheet: View {
             // Header bar
             HStack {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .appFont(.body, design: .rounded, weight: .semibold)
                     .foregroundStyle(.primary)
 
                 Spacer()
@@ -694,7 +699,7 @@ private struct MessageInspectorSheet: View {
                         Text(copied ? "Copied" : "Copy")
                             .transition(.opacity)
                     }
-                    .font(.system(size: 12, weight: .medium))
+                    .appFont(.caption, weight: .medium)
                     .foregroundStyle(copied ? .green : .secondary)
                     .animation(.easeInOut(duration: 0.2), value: copied)
                     .frame(minWidth: 72)
@@ -708,7 +713,7 @@ private struct MessageInspectorSheet: View {
                     dismiss()
                 } label: {
                     Text("Done")
-                        .font(.system(size: 12, weight: .medium))
+                        .appFont(.caption, weight: .medium)
                         .foregroundStyle(.secondary)
                         .frame(minWidth: 72)
                         .padding(.horizontal, 10)
@@ -723,10 +728,10 @@ private struct MessageInspectorSheet: View {
 
             Divider()
 
-            // JSON content
+            // JSON content — monospaced so it looks like an inspector
             ScrollView {
                 Text(json)
-                    .font(.system(size: 13, weight: .regular, design: .monospaced))
+                    .appFont(.callout, design: .monospaced)
                     .foregroundStyle(.primary)
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -738,6 +743,8 @@ private struct MessageInspectorSheet: View {
     }
 }
 
+// MARK: - Message row
+
 private struct MessageRow: View, Equatable {
     let row: MessageRowViewData
     let displayedContent: String
@@ -745,16 +752,12 @@ private struct MessageRow: View, Equatable {
     let resolvedModelName: String?
     let isOrphanedLastUserMessage: Bool
     // For user bubbles: prompt_tokens from the assistant response that follows this user message.
-    // This is the turn's input token count as reported by the API.
     var turnPromptTokens: Int = 0
-    // For user bubbles: cost from the assistant response that follows this user message.
     var turnCost: Double = 0
     var onDelete: () -> Void = {}
     var onEdit: (_ newContent: String) -> Void = { _ in }
     var onRegenerate: () -> Void = {}
     var onResend: () -> Void = {}
-
-    @Environment(\.textBaseSize) private var textBaseSize
 
     // Action toolbar state
     @State private var copied = false
@@ -789,7 +792,7 @@ private struct MessageRow: View, Equatable {
             VStack(alignment: isUser ? .trailing : .leading, spacing: 5) {
                 if !isUser, let resolvedModelName {
                     Text(resolvedModelName)
-                        .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .semibold, design: .rounded))
+                        .appFont(.caption, design: .rounded, weight: .semibold)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .transition(.opacity)
@@ -798,7 +801,7 @@ private struct MessageRow: View, Equatable {
                 Group {
                     if isEditing {
                         TextEditor(text: $editText)
-                            .font(.system(size: TextSizeConfig.scaled(14, base: textBaseSize), weight: .regular, design: .default))
+                            .appFont(.body)
                             .foregroundStyle(.primary)
                             .scrollContentBackground(.hidden)
                             .focused($isEditFocused)
@@ -806,7 +809,7 @@ private struct MessageRow: View, Equatable {
                             .onAppear { isEditFocused = true }
                     } else {
                         Text(renderedContent)
-                            .font(.system(size: TextSizeConfig.scaled(14, base: textBaseSize), weight: .regular, design: .default))
+                            .appFont(.body)
                             .foregroundStyle(.primary)
                             .textSelection(.enabled)
                             .multilineTextAlignment(.leading)
@@ -828,12 +831,11 @@ private struct MessageRow: View, Equatable {
 
                 HStack(spacing: 8) {
                     Text(row.timestamp, style: .time)
-                    // Assistant bubble: show completion_tokens (output tokens for this turn).
+                    // Assistant bubble: completion_tokens (output tokens for this turn).
                     if row.role == .assistant, row.completionTokens > 0 {
                         Text("\(row.completionTokens) tokens")
                     }
-                    // User bubble: show prompt_tokens from the following assistant response
-                    // (the API reports input token count on the response, not the request).
+                    // User bubble: prompt_tokens from the following assistant response.
                     if row.role == .user, turnPromptTokens > 0 {
                         Text("\(turnPromptTokens) tokens")
                     }
@@ -842,7 +844,7 @@ private struct MessageRow: View, Equatable {
                         Text(displayCost, format: .currency(code: "USD"))
                     }
                 }
-                .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .medium, design: .rounded))
+                .appFont(.caption, design: .rounded, weight: .medium)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
             }
@@ -889,8 +891,6 @@ private struct MessageRow: View, Equatable {
             }
 
             // Edit — toggles between pencil (start editing) and checkmark (commit edit).
-            // When committing, isCommitting prevents the focus-loss handler from
-            // cancelling the edit before the save completes.
             MessageActionButton(
                 systemImage: isEditing ? "checkmark.circle" : "pencil",
                 activeTint: isEditing ? .green : nil
@@ -904,9 +904,6 @@ private struct MessageRow: View, Equatable {
                     }
                     onEdit(trimmed)
                     isEditing = false
-                    // Must reset on the next runloop cycle — if we reset synchronously,
-                    // the focus-loss handler fires after us and sees isCommitting == false,
-                    // defeating the guard.
                     DispatchQueue.main.async { isCommitting = false }
                 } else {
                     editText = displayedContent
@@ -925,10 +922,8 @@ private struct MessageRow: View, Equatable {
                 }
             }
 
-            // Delete — hidden while the message is actively streaming to prevent
-            // ghost messages and stuck stop-button state from the stream/delete race.
-            // Two-tap safety pattern otherwise: first tap arms (turns red),
-            // second tap within 3 seconds confirms. Timer auto-disarms after 3 seconds.
+            // Delete — two-tap safety: first tap arms (red), second confirms within 3s.
+            // Hidden while streaming to prevent ghost messages from a stream/delete race.
             if !isEditing && !isLiveStreaming {
                 MessageActionButton(
                     systemImage: "trash",
@@ -971,6 +966,8 @@ private struct MessageRow: View, Equatable {
     }
 }
 
+// MARK: - Composer
+
 private struct Composer: View {
     let isLoading: Bool
     let isStreaming: Bool
@@ -978,7 +975,6 @@ private struct Composer: View {
     let onStop: () -> Void
 
     @State private var draft = ""
-    @Environment(\.textBaseSize) private var textBaseSize
     @FocusState private var focused: Bool
 
     private var canSend: Bool {
@@ -990,7 +986,7 @@ private struct Composer: View {
             TextField("Ask anything", text: $draft, axis: .vertical)
                 .lineLimit(1 ... 5)
                 .focused($focused)
-                .font(.system(size: TextSizeConfig.scaled(15, base: textBaseSize), weight: .regular, design: .default))
+                .appFont(.body)
                 .foregroundStyle(.primary)
                 .textFieldStyle(.plain)
                 .onSubmit {
@@ -1019,7 +1015,7 @@ private struct Composer: View {
         if isStreaming {
             Button(action: onStop) {
                 Image(systemName: "stop.fill")
-                    .appFont(size: 14, weight: .bold)
+                    .appFont(.body, weight: .bold)
                     .foregroundStyle(.primary)
                     .frame(width: 30, height: 30)
                     .background(Color.red.opacity(0.22))
@@ -1029,7 +1025,7 @@ private struct Composer: View {
         } else {
             Button(action: sendIfPossible) {
                 Image(systemName: "arrow.up")
-                    .appFont(size: 14, weight: .bold)
+                    .appFont(.body, weight: .bold)
                     .foregroundStyle(.primary)
                     .frame(width: 30, height: 30)
                     .background(canSend ? Color.primary.opacity(0.16) : Color.primary.opacity(0.08))

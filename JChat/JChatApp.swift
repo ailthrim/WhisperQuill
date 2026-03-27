@@ -61,17 +61,17 @@ struct JChatApp: App {
 
             CommandGroup(after: .textEditing) {
                 Button("Zoom In") {
-                    NotificationCenter.default.post(name: AppCommandNotification.textSizeIncrease, object: nil)
+                    NotificationCenter.default.post(name: AppCommandNotification.textZoomIn, object: nil)
                 }
                 .keyboardShortcut("=", modifiers: [.command])
 
                 Button("Zoom Out") {
-                    NotificationCenter.default.post(name: AppCommandNotification.textSizeDecrease, object: nil)
+                    NotificationCenter.default.post(name: AppCommandNotification.textZoomOut, object: nil)
                 }
                 .keyboardShortcut("-", modifiers: [.command])
 
                 Button("Actual Size") {
-                    NotificationCenter.default.post(name: AppCommandNotification.textSizeReset, object: nil)
+                    NotificationCenter.default.post(name: AppCommandNotification.textZoomReset, object: nil)
                 }
                 .keyboardShortcut("0", modifiers: [.command])
             }

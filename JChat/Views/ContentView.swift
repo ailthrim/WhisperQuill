@@ -17,7 +17,9 @@ struct ContentView: View {
         _conversationStore = State(initialValue: previewStore ?? ConversationStore())
         self.previewForceSetup = previewForceSetup
     }
-    @State private var textBaseSize: CGFloat = TextSizeConfig.defaultSize
+
+    // nil = follow system text size preference; non-nil = user's Cmd+/- override
+    @State private var dynamicTypeSizeOverride: DynamicTypeSize?
     @State private var hasAPIKey = false
 
     // Setup screen only — sidebar owns its own copies for normal use
@@ -47,8 +49,8 @@ struct ContentView: View {
             }
         }
         .background(CanvasBackground())
-        .environment(\.textBaseSize, textBaseSize)
-        .environment(\.font, .system(size: TextSizeConfig.size(for: .body, base: textBaseSize)))
+        // Push the zoom scale factor into the environment so .appFont() picks it up.
+        .environment(\.textScaleFactor, (dynamicTypeSizeOverride ?? .defaultSize).scaleFactor)
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
@@ -63,12 +65,11 @@ struct ContentView: View {
         }
         .onChange(of: showingSettingsFromSetup) { _, isShowing in
             if !isShowing {
-                loadTextSize()
                 loadAPIKeyStatus()
             }
         }
         .task {
-            loadTextSize()
+            loadDynamicTypeSizeOverride()
             loadAPIKeyStatus()
             await modelManager.refreshIfStale(context: modelContext)
             await conversationStore.generatePendingAutoTitles(in: modelContext)
@@ -77,47 +78,56 @@ struct ContentView: View {
         .onChange(of: chats.count) { _, _ in
             selectFirstChatIfNeeded()
         }
-        .onReceive(NotificationCenter.default.publisher(for: AppCommandNotification.textSizeIncrease)) { _ in
-            adjustTextSize(by: TextSizeConfig.step)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: AppCommandNotification.textSizeDecrease)) { _ in
-            adjustTextSize(by: -TextSizeConfig.step)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: AppCommandNotification.textSizeReset)) { _ in
-            resetTextSize()
-        }
         .onReceive(NotificationCenter.default.publisher(for: AppCommandNotification.newChat)) { _ in
             conversationStore.createNewChat(in: modelContext)
         }
+        .onReceive(NotificationCenter.default.publisher(for: AppCommandNotification.textZoomIn)) { _ in
+            handleZoomAction(.increase)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: AppCommandNotification.textZoomOut)) { _ in
+            handleZoomAction(.decrease)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: AppCommandNotification.textZoomReset)) { _ in
+            handleZoomAction(.reset)
+        }
     }
 
-    private func loadTextSize() {
+    // MARK: - Dynamic Type zoom
+
+    /// Load any persisted Cmd+/- override from AppSettings.
+    private func loadDynamicTypeSizeOverride() {
         let settings = AppSettings.fetchOrCreate(in: modelContext)
-        textBaseSize = clampedTextSize(settings.textPointSize)
+        if let key = settings.dynamicTypeSizeOverride {
+            dynamicTypeSizeOverride = DynamicTypeSize.from(persistenceKey: key)
+        }
     }
 
-    private func adjustTextSize(by delta: CGFloat) {
-        let next = clampedTextSize(Double(textBaseSize + delta))
-        guard next != textBaseSize else { return }
-        textBaseSize = next
-        saveTextSize()
-    }
-
-    private func resetTextSize() {
-        guard textBaseSize != TextSizeConfig.defaultSize else { return }
-        textBaseSize = TextSizeConfig.defaultSize
-        saveTextSize()
-    }
-
-    private func saveTextSize() {
+    /// Save the current override (or nil for "follow system") to AppSettings.
+    private func saveDynamicTypeSizeOverride() {
         let settings = AppSettings.fetchOrCreate(in: modelContext)
-        settings.textPointSize = Double(textBaseSize)
+        settings.dynamicTypeSizeOverride = dynamicTypeSizeOverride?.persistenceKey
         try? modelContext.save()
     }
 
-    private func clampedTextSize(_ value: Double) -> CGFloat {
-        CGFloat(min(max(value, Double(TextSizeConfig.minimum)), Double(TextSizeConfig.maximum)))
+    /// Handle Cmd+/-, Cmd+0 from the menu bar.
+    private func handleZoomAction(_ action: TextZoomAction) {
+        let current = dynamicTypeSizeOverride ?? .defaultSize
+        switch action {
+        case .increase:
+            if let bigger = current.steppedUp() {
+                dynamicTypeSizeOverride = bigger
+            }
+        case .decrease:
+            if let smaller = current.steppedDown() {
+                dynamicTypeSizeOverride = smaller
+            }
+        case .reset:
+            dynamicTypeSizeOverride = nil
+        }
+        saveDynamicTypeSizeOverride()
     }
+
+    // MARK: - Helpers
 
     private func selectFirstChatIfNeeded() {
         if conversationStore.selectedChat == nil {
@@ -141,11 +151,11 @@ struct ContentView: View {
     private var setupRequiredView: some View {
         VStack(spacing: 16) {
             Image(systemName: "key.fill")
-                .font(.system(size: TextSizeConfig.scaled(32, base: textBaseSize), weight: .medium))
+                .appFont(.largeTitle)
                 .foregroundStyle(.secondary)
 
             Text("Add your OpenRouter API key to get started.")
-                .font(.system(size: TextSizeConfig.scaled(15, base: textBaseSize), weight: .medium, design: .rounded))
+                .appFont(.body, design: .rounded, weight: .medium)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 340)
@@ -163,17 +173,19 @@ struct ContentView: View {
 
 }
 
+// MARK: - Empty state
+
 private struct EmptyStateView: View {
-    @Environment(\.textBaseSize) private var textBaseSize
+    @Environment(\.textScaleFactor) private var scaleFactor
 
     var body: some View {
         VStack(spacing: 14) {
             Image(systemName: "bubble.left.and.bubble.right.fill")
-                .font(.system(size: TextSizeConfig.scaled(40, base: textBaseSize), weight: .semibold))
+                .font(.system(size: 40 * scaleFactor, weight: .semibold))
                 .foregroundStyle(.secondary)
 
             Text("Select a chat or start a new one")
-                .font(.system(size: TextSizeConfig.scaled(24, base: textBaseSize), weight: .bold, design: .rounded))
+                .appFont(.title, design: .rounded, weight: .bold)
                 .foregroundStyle(.primary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -255,4 +267,3 @@ private func makePreviewContainer() throws -> (ModelContainer, Chat) {
             .modelContainer(fallback)
     }
 }
-

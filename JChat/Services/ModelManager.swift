@@ -6,6 +6,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import os
 
 enum ModelSortOrder: String, CaseIterable, Sendable {
     case name = "Name"
@@ -24,6 +25,7 @@ class ModelManager {
 
     private var allModels: [CachedModel] = []
     private let service = OpenRouterService.shared
+    private let logger = Logger(subsystem: "com.josh.jchat", category: "ModelManager")
 
     // MARK: - Computed Properties
 
@@ -103,7 +105,6 @@ class ModelManager {
             // Upsert: update existing, insert new
             for apiModel in apiModels {
                 if let existing = existingByID[apiModel.id] {
-                    // Update existing
                     existing.name = apiModel.name
                     existing.modelDescription = apiModel.description ?? ""
                     existing.contextLength = apiModel.context_length ?? 0
@@ -117,7 +118,6 @@ class ModelManager {
                     existing.modality = apiModel.architecture?.modality ?? "text→text"
                     existing.lastFetchedAt = Date()
                 } else {
-                    // Insert new
                     let cached = CachedModel(
                         id: apiModel.id,
                         name: apiModel.name,
@@ -143,17 +143,15 @@ class ModelManager {
                 }
             }
 
-            // Update settings
             let settings = AppSettings.fetchOrCreate(in: context)
             settings.lastModelFetchDate = Date()
 
             do {
                 try context.save()
             } catch {
-                print("[ModelManager] Save after model fetch failed: \(error)")
+                logger.error("Save after model fetch failed: \(error.localizedDescription)")
             }
 
-            // Refresh local cache
             loadModels(from: context)
 
         } catch {
@@ -165,7 +163,6 @@ class ModelManager {
     }
 
     func refreshIfStale(context: ModelContext) async {
-        // Load from cache first
         if allModels.isEmpty {
             loadModels(from: context)
         }
@@ -207,7 +204,7 @@ class ModelManager {
         do {
             try context.save()
         } catch {
-            print("[ModelManager] Save after favorite toggle failed: \(error)")
+            logger.error("Save after favorite toggle failed: \(error.localizedDescription)")
         }
         loadModels(from: context)
     }

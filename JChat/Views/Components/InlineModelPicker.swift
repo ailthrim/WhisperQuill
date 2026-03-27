@@ -14,7 +14,6 @@ struct InlineModelPicker: View {
     @Binding var selectedModelID: String?
     @Bindable var modelManager: ModelManager
     @Query(sort: \CachedModel.name) private var cachedModels: [CachedModel]
-    @Environment(\.textBaseSize) private var textBaseSize
 
     @State private var showingPopover = false
     @State private var showingFullManager = false
@@ -26,17 +25,17 @@ struct InlineModelPicker: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "cpu")
-                    .font(.system(size: TextSizeConfig.scaled(12, base: textBaseSize), weight: .semibold))
+                    .appFont(.caption, weight: .semibold)
                     .foregroundStyle(.secondary)
 
                 Text(selectedModelName)
-                    .font(.system(size: TextSizeConfig.scaled(14, base: textBaseSize), weight: .semibold, design: .rounded))
+                    .appFont(.body, design: .rounded, weight: .semibold)
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: true, vertical: false)
                     .lineLimit(1)
 
                 Image(systemName: "chevron.up.chevron.down")
-                    .font(.system(size: TextSizeConfig.scaled(9, base: textBaseSize), weight: .semibold))
+                    .appFont(.caption2, weight: .semibold)
                     .foregroundStyle(.secondary)
             }
         }
@@ -64,9 +63,9 @@ struct InlineModelPicker: View {
             HStack(spacing: 10) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Choose a Model")
-                        .font(.system(size: TextSizeConfig.scaled(14, base: textBaseSize), weight: .bold, design: .rounded))
+                        .appFont(.body, design: .rounded, weight: .bold)
                     Text("\(cachedModels.count) cached models")
-                        .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .medium, design: .rounded))
+                        .appFont(.caption, design: .rounded, weight: .medium)
                         .foregroundStyle(.secondary)
                 }
 
@@ -76,7 +75,7 @@ struct InlineModelPicker: View {
                     showingPopover = false
                     showingFullManager = true
                 }
-                .font(.system(size: TextSizeConfig.scaled(12, base: textBaseSize), weight: .semibold, design: .rounded))
+                .appFont(.caption, design: .rounded, weight: .semibold)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
@@ -85,12 +84,12 @@ struct InlineModelPicker: View {
 
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: TextSizeConfig.scaled(12, base: textBaseSize), weight: .semibold))
+                    .appFont(.caption, weight: .semibold)
                     .foregroundStyle(.secondary)
 
                 TextField("Search models, IDs, providers...", text: $pickerSearchText)
                     .textFieldStyle(.plain)
-                    .font(.system(size: TextSizeConfig.scaled(13, base: textBaseSize), weight: .medium))
+                    .appFont(.subheadline, weight: .medium)
 
                 if !pickerSearchText.isEmpty {
                     Button {
@@ -131,7 +130,7 @@ struct InlineModelPicker: View {
                         }
                     } else if !pickerSearchText.isEmpty {
                         Text("No models match \"\(pickerSearchText)\"")
-                            .font(.system(size: TextSizeConfig.scaled(13, base: textBaseSize), weight: .medium))
+                            .appFont(.subheadline, weight: .medium)
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 10)
@@ -154,7 +153,7 @@ struct InlineModelPicker: View {
                     Spacer()
                     Image(systemName: "chevron.right")
                 }
-                .font(.system(size: TextSizeConfig.scaled(13, base: textBaseSize), weight: .semibold, design: .rounded))
+                .appFont(.subheadline, design: .rounded, weight: .semibold)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
             }
@@ -187,7 +186,7 @@ struct InlineModelPicker: View {
 
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: TextSizeConfig.scaled(10, base: textBaseSize), weight: .semibold, design: .rounded))
+            .appFont(.caption2, design: .rounded, weight: .semibold)
             .foregroundStyle(.secondary)
             .textCase(.uppercase)
             .padding(.horizontal, 6)
@@ -204,7 +203,7 @@ struct InlineModelPicker: View {
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(alignment: .center, spacing: 6) {
                         Text(model.uiDisplayName)
-                            .font(.system(size: TextSizeConfig.scaled(13, base: textBaseSize), weight: .semibold, design: .rounded))
+                            .appFont(.subheadline, design: .rounded, weight: .semibold)
                             .lineLimit(1)
 
                         if model.isFree {
@@ -214,29 +213,22 @@ struct InlineModelPicker: View {
 
                     HStack(spacing: 6) {
                         Text(model.modelSlug)
-                            .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .medium, design: .rounded))
-                            .foregroundStyle(.secondary)
                         Text("•")
-                            .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .semibold))
-                            .foregroundStyle(.tertiary)
                         Text("\(model.contextLengthFormatted) ctx")
-                            .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .medium, design: .rounded))
-                            .foregroundStyle(.secondary)
                         Text("•")
-                            .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .semibold))
-                            .foregroundStyle(.tertiary)
                         Text(compactPrice(for: model))
-                            .font(.system(size: TextSizeConfig.scaled(11, base: textBaseSize), weight: .medium, design: .rounded))
                             .foregroundStyle(model.isFree ? .green : .secondary)
                             .lineLimit(1)
                     }
+                    .appFont(.caption, design: .rounded, weight: .medium)
+                    .foregroundStyle(.secondary)
                 }
 
                 Spacer()
 
                 if model.id == selectedModelID {
                     Image(systemName: "checkmark")
-                        .font(.system(size: TextSizeConfig.scaled(12, base: textBaseSize), weight: .bold))
+                        .appFont(.caption, weight: .bold)
                         .foregroundStyle(Color.accentColor)
                 }
             }

@@ -5,6 +5,10 @@
 
 import SwiftData
 import SwiftUI
+import os
+
+// Logger for keychain and settings persistence errors.
+private let logger = Logger(subsystem: "com.josh.jchat", category: "Settings")
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -43,9 +47,7 @@ struct SettingsView: View {
                                 credits: creditsBalance,
                                 requestInfo: lastRequestInfo
                             )
-                            .transition(
-                                .opacity.combined(with: .move(edge: .leading))
-                            )
+                            .transition(.opacity)
                         }
 
                         Spacer()
@@ -61,6 +63,7 @@ struct SettingsView: View {
                             .disabled(apiKey.isEmpty)
                         }
                     }
+                    .animation(.easeIn(duration: 0.15), value: keyValidationMessage)
                 } header: {
                     Text("API Configuration")
                 } footer: {
@@ -100,7 +103,6 @@ struct SettingsView: View {
                 }
             }
             .formStyle(.grouped)
-            .animation(.easeOut(duration: 0.2), value: keyValidationMessage)
             .navigationTitle("Settings")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -118,7 +120,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .frame(minWidth: 450, minHeight: 350)
+        .frame(minWidth: 500, minHeight: 400)
         .task {
             loadSettings()
         }
@@ -171,16 +173,11 @@ struct SettingsView: View {
                 keyValidationDetails = "Models available: \(modelsCount)"
             }
         } else {
-            if diagnostics.statusCode > 0 {
-                keyValidationMessage = "Validation failed (status \(diagnostics.statusCode))"
-                if let errorBody = diagnostics.errorBody, !errorBody.isEmpty {
-                    keyValidationDetails = errorBody
-                }
-            } else {
-                keyValidationMessage = "Validation failed"
-                if let errorBody = diagnostics.errorBody, !errorBody.isEmpty {
-                    keyValidationDetails = errorBody
-                }
+            keyValidationMessage = diagnostics.statusCode > 0
+                ? "Validation failed (status \(diagnostics.statusCode))"
+                : "Validation failed"
+            if let errorBody = diagnostics.errorBody, !errorBody.isEmpty {
+                keyValidationDetails = errorBody
             }
         }
 
@@ -200,7 +197,6 @@ struct SettingsView: View {
     }
 
     private func saveSettings() {
-        // Save API key
         let normalizedKey = KeychainManager.normalizeKey(apiKey)
         apiKey = normalizedKey
         do {
@@ -213,10 +209,9 @@ struct SettingsView: View {
             // Keychain errors are OS-level failures (e.g. permission denied, corrupted keychain).
             // We log them for debugging but cannot recover — the UI has no meaningful way to
             // communicate a keychain write failure to the user in this dismiss-on-save flow.
-            print("[Settings] Keychain save failed: \(error)")
+            logger.error("Keychain save failed: \(error.localizedDescription)")
         }
 
-        // Save defaults
         let settings = AppSettings.fetchOrCreate(in: modelContext)
         settings.defaultCharacterID = selectedCharacterID
         settings.defaultModelID = selectedModelID
@@ -250,26 +245,24 @@ private struct KeyValidationStatusView: View {
         HStack(spacing: 10) {
             // Status icon
             Image(systemName: isValid ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 18, weight: .semibold))
+                .appFont(.title3, weight: .semibold)
                 .foregroundStyle(isValid ? Color.green : Color.red)
 
             VStack(alignment: .leading, spacing: 4) {
-                // Primary status line
-                HStack(spacing: 8) {
-                    Text(isValid ? "Valid API Key" : (message ?? "Validation Failed"))
-                        .appFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(isValid ? Color.green : Color.red)
+                // Status text
+                Text(isValid ? "Valid API Key" : (message ?? "Validation Failed"))
+                    .appFont(.subheadline, weight: .semibold)
+                    .foregroundStyle(isValid ? Color.green : Color.red)
 
-                    // Inline chips for model count and credits on success
-                    if isValid {
+                // Stats chips on their own row so they don't crowd the label
+                if isValid {
+                    HStack(spacing: 6) {
                         if let details, details.contains("Models available:") {
                             let count = details.replacingOccurrences(of: "Models available: ", with: "")
                             StatChip(label: "\(count) models", color: .secondary)
                         }
                         if let credits {
                             StatChip(label: credits, color: .green)
-                                .transition(.opacity)
-                                .animation(.easeOut(duration: 0.15), value: credits)
                         }
                     }
                 }
