@@ -549,9 +549,9 @@ final class ConversationStore {
     /// which may be a large reasoning model (slow, expensive, prone to preamble).
     /// Falls back to the chat's own model if the dedicated model fails (handled at call site).
     private func autoTitleModelID(for chat: Chat) -> String {
-        // google/gemini-2.0-flash-lite: fast, cheap, excellent instruction-following for short tasks.
+        // google/gemini-2.5-flash-lite: fast, cheap, excellent instruction-following for short tasks.
         // Prefer the free tier (:free suffix) when available; falls back gracefully.
-        "google/gemini-2.0-flash-lite"
+        "google/gemini-2.5-flash-lite"
     }
 
     private func normalizedAutoTitle(_ raw: String) -> String? {
