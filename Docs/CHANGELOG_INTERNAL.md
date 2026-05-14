@@ -8,7 +8,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-(In-progress work goes here)
+### Changed
+- Replaced the old root project entrypoint with `AGENTS.md` for Codex.
+- Updated docs to treat `Docs/` as the project memory layer and `Docs/PROJECT_GUIDE.md` as durable project memory.
+- Made clean-before-build an explicit build rule.
+- Clarified that XcodeBuildMCP should be available, but direct `xcodebuild` is acceptable for this macOS-only app.
+- Documented the current canonical project state: `WhisperQuill.xcodeproj`, scheme `WhisperQuill`, source root `JChat/`, UI directory `JChat/UI/`.
+
+### Fixed
+- Removed non-Codex operational language from active docs.
+- Clarified that stale pre-rename artifacts such as `JChat.xcodeproj`, `JChat/V2/`, and `JChat/JChat.entitlements` should not exist in the working tree.
+
+---
+
+## [2026-05-14] - Repo Recovery: Stale JChat Artifacts Removed
+
+### Fixed
+- Removed stale untracked February-era JChat files that had reappeared in the working tree and were breaking the app build.
+- Removed copied conflict files with ` (1)` suffixes and stray `.DS_Store` files from both the working tree and Git metadata.
+- Removed invalid copied Git refs such as `refs/heads/main (1)`.
+
+### Removed
+- `JChat.xcodeproj/`
+- `JChat/V2/`
+- `JChat/JChat.entitlements`
+- `.github/workflows/ci.yml`
+- Root `CONTRIBUTING.md`
+
+### Notes
+- `main` / `origin/main` was verified as the newest real branch.
+- The valid app project is `WhisperQuill.xcodeproj`.
+- `xcodebuild` against scheme `WhisperQuill` passed after cleanup.
 
 ---
 
@@ -51,12 +81,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **GitHub Issues**: migrated all open bugs and FRs from `KNOWN_ISSUES.md` — 13 open issues (#7–19) with `bug`, `feature`, `priority: high`, `priority: low` labels
-- **`CLAUDE.md`**: Reference Docs Policy section — agents must consult Apple HIG/SwiftUI and `Docs/openapi.json` before writing UI or API code
+- **root agent context doc**: Reference Docs Policy section — agents must consult Apple HIG/SwiftUI and OpenRouter docs before writing UI or API code
 
 ### Changed
 - **`KNOWN_ISSUES.md`**: now a resolved-issue log only; open backlog lives at GitHub Issues
 - **`PROJECT_GUIDE.md`**: near-term backlog bullets replaced with GitHub Issues link; primary file paths corrected to `WhisperQuill/JChat/` prefix; duplicate MCP JSON schema block removed; Active Branch section removed (volatile, wrong place for it); Git Workflow section added (absorbed from deleted CONTRIBUTING.md)
-- **`CLAUDE.md`**: canonical docs table updated — CONTRIBUTING.md removed, KNOWN_ISSUES.md description updated to reflect new role
+- **root agent context doc**: canonical docs table updated — CONTRIBUTING.md removed, KNOWN_ISSUES.md description updated to reflect new role
 - **GitHub labels**: deleted 7 unused defaults (`documentation`, `duplicate`, `good first issue`, `help wanted`, `invalid`, `question`, `wontfix`); created `priority: high` and `priority: low`; renamed `enhancement` → `feature`
 
 ### Removed
@@ -216,11 +246,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - `Docs/CHANGELOG_INTERNAL.md` — Keep a Changelog format, session history
-- `CLAUDE.md` — Docs index, AI tool policy, mode selection guide, multi-agent boundaries, changelog update policy
+- Root agent context doc — Docs index, AI tool policy, mode selection guide, multi-agent boundaries, changelog update policy
 
 ### Changed
-- `CLAUDE.md` — Full rewrite; expanded from sparse pointer file to proper Claude Code entry point
-- `CONTRIBUTING.md` — Streamlined to git workflow only; removed all content now owned by CLAUDE.md or PROJECT_GUIDE.md
+- Root agent context doc — Full rewrite; expanded from sparse pointer file to proper agent entry point
+- `CONTRIBUTING.md` — Streamlined to git workflow only; removed all content now owned by the root agent context doc or PROJECT_GUIDE.md
 - `Docs/PROJECT_GUIDE.md` — Removed duplicated Workflow Rules section; cleaned up build workflow repetition
 
 ### Removed
@@ -229,8 +259,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Notes
 - Strict content ownership: each topic lives in exactly one file
-- Universal format across Claude, Codex, Gemini — canonical docs in `Docs/` readable by any AI
-- End-of-session changelog update is now an automatic policy in CLAUDE.md
+- Universal format across AI tools — canonical docs in `Docs/` readable by any agent
+- End-of-session changelog update is now an automatic policy in the root agent context doc
 
 ---
 
@@ -239,7 +269,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - `CHANGELOG_INTERNAL.md` created as living session history (Keep a Changelog format)
 - `Docs/PROJECT_GUIDE.md`: xcodebuildmcp environment specs, defaults schema, and full command reference
-- `CLAUDE.md`: policy to update CHANGELOG_INTERNAL.md at end of each session
+- Root agent context doc: policy to update CHANGELOG_INTERNAL.md at end of each session
 - Memory system for tracking project patterns across sessions
 
 ### Changed

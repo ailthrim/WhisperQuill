@@ -18,7 +18,7 @@
 
 ## What is WhisperQuill?
 
-WhisperQuill is a lightweight, native macOS chat client that connects to [OpenRouter](https://openrouter.ai) — giving you access to dozens of AI models (GPT, Claude, Gemini, Llama, and more) through a single, clean interface built entirely in SwiftUI.
+WhisperQuill is a lightweight, native macOS chat client that connects to [OpenRouter](https://openrouter.ai) — giving you access to dozens of AI models through a single, clean interface built entirely in SwiftUI.
 
 This is a **solo hobby project** — primarily a playground for learning agentic AI-assisted coding workflows and experimenting with macOS native UI. It is not a polished commercial product, but it is a fully functional app used daily.
 
@@ -101,7 +101,7 @@ Active backlog is tracked on [GitHub Issues](https://github.com/joshellis625/JCh
 
 Current priorities:
 1. Freeze prevention and transcript stability in long chats
-2. V2 UI polish toward a clean, minimal chat experience
+2. UI polish toward a clean, minimal chat experience
 3. OpenRouter streaming reliability and consistency
 4. Feature re-expansion after stability is locked
 

@@ -1,4 +1,4 @@
-# JChat — Known Issues & Feature Requests
+# WhisperQuill — Known Issues & Feature Requests
 
 **Open bugs and feature requests are tracked in [GitHub Issues](https://github.com/joshellis625/JChat/issues).** Add new items there, not here.
 
@@ -184,4 +184,4 @@ The data layer is already in place — `Character` model, `Chat.character` relat
 | **FR** | Feature request or enhancement |
 | **Severity/Priority** | High > Medium > Low |
 
-*Last updated: 2026-03-06 (session 2)*
+*Last updated: 2026-05-14 (docs converted for Codex workflow)*

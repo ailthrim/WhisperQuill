@@ -1,6 +1,6 @@
-# JChat Project Guide (Canonical)
+# WhisperQuill Project Guide (Canonical)
 
-This is the single source of truth for architecture, workflow, validation, and active direction.
+This is the single source of truth for architecture, workflow, validation, and active direction. Treat this file as durable project memory for Codex and future agents.
 
 ## Product Overview
 WhisperQuill is a native SwiftUI chat app for macOS that connects to OpenRouter.
@@ -75,12 +75,41 @@ Primary files (paths relative to repo root, as seen in Xcode project navigator u
 - **Signing:** Auto-signed by Xcode (Apple Developer account registered)
 - **Persistence:** SwiftData + Keychain (`com.josh.jchat` / `openrouter-api-key`)
 
-## XcodeBuildMCP (Primary tool to interface directly with Xcode)
-- Utilize Claude skill: "xcodebuildmcp-cli". It contains everything you need.
+## Canonical Project State
+- Current project file: `WhisperQuill.xcodeproj`
+- Current scheme: `WhisperQuill`
+- Current source root: `JChat/`
+- Current UI directory: `JChat/UI/`
+- Obsolete pre-rename artifacts must not exist in the working tree:
+  - `JChat.xcodeproj`
+  - `JChat/V2/`
+  - `JChat/JChat.entitlements`
+  - root `CONTRIBUTING.md`
+  - `.github/workflows/ci.yml`
+
+If these appear as untracked files, treat them as stale restored/copy-conflict artifacts unless there is new evidence otherwise.
+
+## Build Workflow
+- Clean the build folder before every build.
+- XcodeBuildMCP should be available, but it is most useful for iOS simulator workflows. For this macOS-only app, explicit `xcodebuild` commands against `WhisperQuill.xcodeproj` are acceptable and often simpler.
+- If using XcodeBuildMCP, first verify it is configured for `WhisperQuill.xcodeproj`; do not trust stale defaults from older projects.
+- Use a temporary DerivedData path when validating from the terminal to avoid stale build products.
+
+Example validation command:
+
+```sh
+xcodebuild -quiet \
+  -project WhisperQuill.xcodeproj \
+  -scheme WhisperQuill \
+  -configuration Debug \
+  -destination 'platform=macOS,arch=arm64' \
+  -derivedDataPath /private/tmp/WhisperQuillDerivedData \
+  clean build
+```
 
 ## Regression Checklist
 Run before shipping behavior-affecting changes (chat/streaming/layout/persistence):
-- Build passes, and tests pass for risky changes.
+- Clean build folder, then build passes. Tests pass for risky changes.
 - App launches/stops cleanly.
 - New chat/send/stream/stop/regenerate flow works.
 - Long-chat typing + scrolling has no freeze.
@@ -93,7 +122,7 @@ Run before shipping behavior-affecting changes (chat/streaming/layout/persistenc
 ## Roadmap (Current)
 Priority order:
 1. Freeze prevention and transcript stability in long chats.
-2. V2 UI polish toward a clean ChatGPT-style experience.
+2. UI polish toward a clean ChatGPT-style experience.
 3. OpenRouter streaming reliability and consistency.
 4. Documentation simplicity and low-friction solo workflow.
 5. Feature re-expansion only after stability is locked.
