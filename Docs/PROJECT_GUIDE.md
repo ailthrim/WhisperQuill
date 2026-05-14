@@ -3,12 +3,21 @@
 This is the single source of truth for architecture, workflow, validation, and active direction. Treat this file as durable project memory for Codex and future agents.
 
 ## Product Overview
-WhisperQuill is a native SwiftUI chat app for macOS that connects to OpenRouter.
+WhisperQuill is a native SwiftUI chat app for macOS that connects to OpenRouter. The core workflow is simple: store an OpenRouter API key securely, choose a model, and chat in a native macOS UI.
+
+The app is inspired by Cumbersome.app, but the current direction is a personal, practical macOS chat client rather than a commercial clone.
+
+Project history:
+- The original app had a broader feature set.
+- A visual redesign pass made the app prettier but introduced instability.
+- The project then returned to a simpler baseline and rebuilt features gradually using more idiomatic SwiftUI and Liquid Glass-style system UI.
+- Future UI work should be open to SwiftUI-wrapped AppKit where native macOS behavior needs AppKit affordances.
 
 Current direction:
 - Stability and responsiveness are prioritized over feature breadth.
 - macOS (`arm64`) is the primary daily target.
 - UI: native SwiftUI, Liquid Glass/material surfaces, SF Symbols.
+- Use SwiftUI first, but use SwiftUI-wrapped AppKit deliberately when it is the right macOS-native tool.
 - Source of truth for UI standards: [Apple SwiftUI Documentation](https://developer.apple.com/documentation/swiftui) and Apple HIG.
 
 ## Reference Links

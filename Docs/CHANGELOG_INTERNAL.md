@@ -14,10 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Made clean-before-build an explicit build rule.
 - Clarified that XcodeBuildMCP should be available, but direct `xcodebuild` is acceptable for this macOS-only app.
 - Documented the current canonical project state: `WhisperQuill.xcodeproj`, scheme `WhisperQuill`, source root `JChat/`, UI directory `JChat/UI/`.
+- Documented the product arc: broad early feature set, unstable visual redesign, return to basics, and current careful rebuild with SwiftUI, Liquid Glass-style UI, and selective SwiftUI-wrapped AppKit.
 
 ### Fixed
 - Removed non-Codex operational language from active docs.
 - Clarified that stale pre-rename artifacts such as `JChat.xcodeproj`, `JChat/V2/`, and `JChat/JChat.entitlements` should not exist in the working tree.
+- Deleted fully merged stale branches after confirming they had no commits unique from `main`.
 
 ---
 

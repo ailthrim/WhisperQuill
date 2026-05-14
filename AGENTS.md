@@ -1,6 +1,8 @@
 # WhisperQuill — Codex Project Context
 
-WhisperQuill is a native SwiftUI chat app for macOS that connects to OpenRouter. This is a solo hobby project.
+WhisperQuill is a native SwiftUI chat app for macOS that connects to OpenRouter. This is a solo hobby project inspired by Cumbersome.app.
+
+The app stores an OpenRouter API key securely, lets the user pick models, and provides a native macOS chat interface. It had a broader early feature set, went through a visual redesign that caused instability, then returned to a simpler baseline and is now being rebuilt carefully with idiomatic SwiftUI, Liquid Glass-style system UI, and selective SwiftUI-wrapped AppKit where macOS-native behavior needs it.
 
 ## Canonical Docs
 
@@ -19,6 +21,7 @@ Read `Docs/PROJECT_GUIDE.md` first. It is the source of truth for architecture, 
 - Keep session history and meaningful recovery notes in `Docs/CHANGELOG_INTERNAL.md`.
 - Update docs at natural checkpoints after code, build, workflow, or architecture changes.
 - Do not recreate stale pre-rename artifacts. The canonical project is `WhisperQuill.xcodeproj`.
+- Continue from the current `main` state. Do not revive older branches or pre-rename project layouts unless the user explicitly asks for archaeology.
 
 ## Build Rules
 
